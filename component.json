@@ -1,0 +1,6 @@
+{
+	"name": "Backbone.Jsonify",
+	"version": "0.1.0",
+	"main": "./lib/backbone.jsonify.min.js",
+	"dependencies": {}
+}
