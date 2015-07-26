@@ -44,9 +44,9 @@ test("Omits attributes provided by \"excludeInJson\" option.", function () {
 
 test("Filters attributes provided by \"filterInJson\" option.", function () {
 	var json = artist.toJSON({
-			filterInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
-				return (attrKey == "firstName") || _.isNumber(attrValue);
-			}
+		filterInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
+			return (attrKey == "firstName") || _.isNumber(attrValue);
+		}
 	});
 
 	// Outputs {firstName: "Wassily", age: 26}
