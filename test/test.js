@@ -21,44 +21,44 @@ var movie = new Backbone.Model({
 
 test("Picks attributes provided by \"includeInJson\" option.", function () {
 	var json = artist.toJSON({
-	    includeInJson: "firstName" // Only picks firstName
+		includeInJson: "firstName" // Only picks firstName
 	});
 
 	// Outputs {firstName: "Wassily"}
 	deepEqual(json, {
-	  firstName: "Wassily"
+		firstName: "Wassily"
 	});
 });
 
 test("Omits attributes provided by \"excludeInJson\" option.", function () {
 	var json = artist.toJSON({
-	    excludeInJson: "firstName" // Omits firstName
+		excludeInJson: "firstName" // Omits firstName
 	});
 
 	// Outputs {lastName: "Kandinsky"}
 	deepEqual(json, {
-	  lastName: "Kandinsky",
-	  age: 26
+		lastName: "Kandinsky",
+		age: 26
 	});
 });
 
 test("Filters attributes provided by \"filterInJson\" option.", function () {
-    var json = artist.toJSON({
+	var json = artist.toJSON({
 	    filterInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
-	        return (attrKey == "firstName") || _.isNumber(attrValue);
+				return (attrKey == "firstName") || _.isNumber(attrValue);
 	    }
 	});
 
 	// Outputs {firstName: "Wassily", age: 26}
 	deepEqual(json, {
-	  firstName: "Wassily",
-	  age: 26
+		firstName: "Wassily",
+		age: 26
 	});
 });
 
 test("Deep serialization.", function () {
 	var json = director.toJSON();
-    ok(json.lastName !== director.attributes.lastName);
+	ok(json.lastName !== director.attributes.lastName);
 });
 
 test("Serializes model and collection attributes.", function () {
