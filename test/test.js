@@ -1,22 +1,22 @@
 var artist = new Backbone.Model({
-  firstName: "Wassily",
-  lastName: "Kandinsky",
-  age: 26
+	firstName: "Wassily",
+	lastName: "Kandinsky",
+	age: 26
 });
 
 var director = new Backbone.Model({
-  firstName: "Pedro",
-  lastName: {
-  	first: 	"Montoro",
-  	second: "Gimeno"
-  },
-  age: 38
+	firstName: "Pedro",
+	lastName: {
+		first: 	"Montoro",
+		second: "Gimeno"
+	},
+	age: 38
 });
 
 var movie = new Backbone.Model({
-  title: "Backbone Jsonify",
-  artists: new Backbone.Collection([artist]),
-  director: director
+	title: "Backbone Jsonify",
+	artists: new Backbone.Collection([artist]),
+	director: director
 });
 
 test("Picks attributes provided by \"includeInJson\" option.", function () {
