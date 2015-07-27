@@ -28,7 +28,7 @@ Function. Looks through each attribute in the model, and only picks all the attr
 
 The function interfece looks as follow:
 ```javascript
-function(attrKey, attrValue)
+function(attrValue, attrKey)
 ```
 
 ### Example
