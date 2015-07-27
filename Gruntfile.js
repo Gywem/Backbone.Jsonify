@@ -1,5 +1,5 @@
 /*global module:false */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 	'use strict';
 
 	// Project configuration.
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
 				stripBanners: true
 			},
 			lib: {
-				src: [],
+				src: ['src/<%= pkg.name %>.js'],
 				dest: 'lib/<%= pkg.name %>.js'
 			}
 		},
@@ -74,9 +74,9 @@ module.exports = function(grunt) {
 	});
 
 	// Grunt-Contrib Tasks
-	Object.keys( grunt.config( 'pkg' ).devDependencies ).forEach( function(dep){
+	Object.keys(grunt.config('pkg').devDependencies).forEach(function (dep) {
 		if (/^grunt\-/i.test(dep)) {
-			grunt.loadNpmTasks( dep );
+			grunt.loadNpmTasks(dep);
 		} // if
 	});
 
