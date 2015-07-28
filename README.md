@@ -42,6 +42,10 @@ artist.toJSON({
 	includeInJson: "firstName" // Only picks firstName
 }); // Outputs {firstName: "Wassily"}
 
+artist.toJSON({
+	excludeInJson: "firstName" // Omits firstName
+}); // Outputs {lastName: "Kandinsky"}
+
 artist.set({age: 26});
 
 artist.toJSON({
