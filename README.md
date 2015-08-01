@@ -28,7 +28,7 @@ Function. Looks through each attribute in the model, and only picks all the attr
 
 The function interfece looks as follow:
 ```javascript
-function(attrKey, attrValue)
+function(attrValue, attrKey)
 ```
 
 ### Example
@@ -41,6 +41,10 @@ var artist = new Backbone.Model({
 artist.toJSON({
 	includeInJson: "firstName" // Only picks firstName
 }); // Outputs {firstName: "Wassily"}
+
+artist.toJSON({
+	excludeInJson: "firstName" // Omits firstName
+}); // Outputs {lastName: "Kandinsky"}
 
 artist.set({age: 26});
 
