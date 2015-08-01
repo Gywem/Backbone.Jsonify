@@ -12,7 +12,7 @@ The new configuration options accepted by "toJSON" function are described below:
 model.toJSON([options]) 
 ```
 
-### Configuration
+### Options
 
 #### includeInJson
 
