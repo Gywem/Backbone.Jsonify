@@ -1,6 +1,3 @@
-/*! backbone.jsonify - v0.1.0 - 2015-08-01
-* Copyright (c) 2015 Nacho Codoñer; Licensed MIT */
-
 (function (root, factory) {
 
 	if (typeof define === 'function' && define.amd) {

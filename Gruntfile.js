@@ -6,11 +6,15 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		// Metadata.
 		pkg: grunt.file.readJSON('package.json'),
-		banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+		meta: {
+			version: '<%= pkg.version %>',
+			banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
 			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
 			'<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
 			'* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-			' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
+			' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n' +
+			'\n'
+		},		
 		// Task configuration.
 		bump: {
 			options: {
@@ -21,13 +25,30 @@ module.exports = function (grunt) {
 		clean: {
 			lib: ['./lib']
 		},
+		preprocess: {
+			bundle: {
+				src: 'src/build/bundled.js',
+				dest: 'tmp/<%= pkg.name %>.js'
+			}
+		},
+		template: {
+			options: {
+				data: {
+					version: '<%= pkg.version %>'
+				}
+			},
+			bundle: {
+				src: '<%= preprocess.bundle.dest %>',
+				dest: '<%= preprocess.bundle.dest %>'
+			}
+		},
 		concat: {
 			options: {
-				banner: '<%= banner %>',
+				banner: '<%= meta.banner %>',
 				stripBanners: true
 			},
 			lib: {
-				src: ['src/<%= pkg.name %>.js'],
+				src: '<%= preprocess.bundle.dest %>',
 				dest: 'lib/<%= pkg.name %>.js'
 			}
 		},
@@ -81,7 +102,7 @@ module.exports = function (grunt) {
 	});
 
 	// Default task.
-	grunt.registerTask('default', ['clean', 'concat', 'jshint', 'qunit', 'uglify']);
+	grunt.registerTask('default', ['clean', 'preprocess', 'template', 'concat', 'jshint', 'qunit', 'uglify']);
 	// Test task.
 	grunt.registerTask('test', ['qunit']);
 
