@@ -33,8 +33,10 @@
 		return object;
 	};
 	
-	Backbone.Model.prototype.toJSON = function () {
-		var options = arguments[0];
+	Backbone.Model.prototype.exToJSON = exToJSON;
+	
+	Backbone.Model.prototype.toJSON = _.wrap(exToJSON, function (exToJSON) {
+		var options = arguments[1];
 	
 		var output;
 		if (options && options.includeInJson) { // `includeInJson` logic
@@ -55,7 +57,7 @@
 		output = deepSerialize(output);
 	
 		return output;
-	};
+	});
 	
 	
 }));
