@@ -16,9 +16,11 @@
 }(this, function (Backbone, _) {
 	'use strict';
 
+  Backbone.Jsonify = {};
+
 	Backbone.Jsonify.VERSION =  '<%= version %>';
 
 	// @include ../backbone.jsonify.js
-	
+
 }));
 

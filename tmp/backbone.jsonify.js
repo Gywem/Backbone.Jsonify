@@ -16,6 +16,8 @@
 }(this, function (Backbone, _) {
 	'use strict';
 
+  Backbone.Jsonify = {};
+
 	Backbone.Jsonify.VERSION =  '0.1.0';
 
 	var exToJSON = Backbone.Model.prototype.toJSON;
@@ -59,6 +61,6 @@
 		return output;
 	});
 	
-	
+
 }));
 
