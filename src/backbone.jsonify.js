@@ -23,13 +23,6 @@ Backbone.Model.prototype.toJSON = _.wrap(exToJSON, function (exToJSON) {
 		output = _.pick(this.attributes, options.includeInJson);
 	} else if (options && options.excludeInJson) { // `excludeInJson` logic
 		output = _.omit(this.attributes, options.excludeInJson);
-	} else if (options && options.filterInJson) { // `filterInJson` logic
-		output = {};
-		_.each(this.attributes, function (attrValue, attrKey) {
-			if (options.filterInJson(attrValue, attrKey)) {
-				output[attrKey] = attrValue;
-			}
-		});
 	} else { // default `toJSON` logic
 		output = exToJSON.call(this, options);
 	}

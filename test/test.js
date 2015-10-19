@@ -1,6 +1,6 @@
 var artist = new Backbone.Model({
-	firstName: "Wassily",
-	lastName: "Kandinsky",
+	firstName: 	"Wassily",
+	lastName: 	"Kandinsky",
 	age: 26
 });
 
@@ -20,6 +20,7 @@ var movie = new Backbone.Model({
 });
 
 test("Picks attributes provided by \"includeInJson\" option.", function () {
+	// String parameter
 	var json = artist.toJSON({
 		includeInJson: "firstName" // Only picks firstName
 	});
@@ -28,9 +29,36 @@ test("Picks attributes provided by \"includeInJson\" option.", function () {
 	deepEqual(json, {
 		firstName: "Wassily"
 	});
+
+	// Array parameter
+	json = artist.toJSON({
+		includeInJson: ["firstName", "lastName"] // Picks firstName and lastName
+	});
+
+	// Outputs {firstName: "Wassily", lastName: "Kandinsky"}
+	deepEqual(json, {
+		firstName: 	"Wassily",
+		lastName: 	"Kandinsky"
+	});
+
+	// Function parameter
+	json = artist.toJSON({
+		includeInJson: function(attrValue, attrKey, object) { // Only picks firstName and attribute values that are numbers
+			return (attrKey == "firstName") 
+				|| _.isNumber(attrValue);
+		}
+	});
+
+	// Outputs {firstName: "Wassily", age: 26}
+	deepEqual(json, {
+		firstName: "Wassily",
+		age: 26
+	});
+
 });
 
 test("Omits attributes provided by \"excludeInJson\" option.", function () {
+	// String parameter
 	var json = artist.toJSON({
 		excludeInJson: "firstName" // Omits firstName
 	});
@@ -40,20 +68,30 @@ test("Omits attributes provided by \"excludeInJson\" option.", function () {
 		lastName: "Kandinsky",
 		age: 26
 	});
-});
 
-test("Filters attributes provided by \"filterInJson\" option.", function () {
-	var json = artist.toJSON({
-		filterInJson: function(attrValue, attrKey) { // Only picks firstName and attribute values that are numbers
-			return (attrKey == "firstName") || _.isNumber(attrValue);
+	// Array parameter
+	json = artist.toJSON({
+		excludeInJson: ["firstName", "lastName"] // Omits firstName and lastName
+	});
+
+	// Outputs {age: 26}
+	deepEqual(json, {
+		age: 26
+	});
+
+	// Function parameter
+	json = artist.toJSON({
+		excludeInJson: function(attrValue, attrKey, object) { // Omits firstName and attribute values that are numbers
+			return (attrKey == "firstName") 
+				|| _.isNumber(attrValue);
 		}
 	});
 
-	// Outputs {firstName: "Wassily", age: 26}
+	// Outputs {lastName: "Kandinsky"}
 	deepEqual(json, {
-		firstName: "Wassily",
-		age: 26
+		lastName: "Kandinsky"
 	});
+
 });
 
 test("Deep serialization.", function () {

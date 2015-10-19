@@ -1,7 +1,7 @@
 {
   "name": "backbone.jsonify",
   "description": "Backbone helper that alters \"toJson\" function to extend functionalities.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Nacho Codoñer",
     "email": "igcogi@gmail.com"

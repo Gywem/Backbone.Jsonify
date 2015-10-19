@@ -16,22 +16,18 @@ model.toJSON([options])
 
 #### includeInJson
 
-String or String[]. Returns the object which represents the model but only picks the provided attribute/s.
+
+**String**, **String[]** or **Function**. Returns the object which represents the model but only picks the provided attribute/s. 
+
+The function looks through each attribute in the model, and picks all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
 
 #### excludeInJson
 
-String or String[]. Returns the object which represents the model but omits the provided attribute/s.
+**String**, **String[]** or **Function**. Returns the object which represents the model but omits the provided attribute/s.
 
-#### filterInJson
+The function looks through each attribute in the model, and omits all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
 
-Function. Looks through each attribute in the model, and only picks all the attributes that pass a truth test defined by the function.
-
-The function interfece looks as follow:
-```javascript
-function(attrValue, attrKey)
-```
-
-### Example
+### Examples
 ```javascript
 var artist = new Backbone.Model({
   firstName: "Wassily",
@@ -49,10 +45,17 @@ artist.toJSON({
 artist.set({age: 26});
 
 artist.toJSON({
-	filterInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
+	includeInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
         return (attrKey == "firstName") || _.isNumber(attrValue);
     }
 }); // Outputs {firstName: "Wassily", age: 26}
+
+artist.toJSON({
+	excludeInJson: function(attrKey, attrValue) { // Omits firstName and attribute values that are numbers
+        return (attrKey == "firstName") || _.isNumber(attrValue);
+    }
+}); // Outputs {lastName: "Kandinsky"}
+
 ```
 ## Building and Testing
 First install locally all the required development dependencies.
