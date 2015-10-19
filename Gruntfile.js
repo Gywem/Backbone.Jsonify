@@ -8,7 +8,13 @@ module.exports = function (grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		meta: {
 			version: '<%= pkg.version %>',
-			banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+			base_banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+			'<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
+			'* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+			' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n' +
+			'\n',
+			supermodel_banner: '/*! supermodel.jsonify - v<%= pkg.version %> - ' +
 			'<%= grunt.template.today("yyyy-mm-dd") %>\n' +
 			'<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
 			'* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
@@ -23,12 +29,23 @@ module.exports = function (grunt) {
 			files: ['package.json', 'component.json']
 		},
 		clean: {
-			lib: ['./lib']
+			base: [
+				'lib/<%= pkg.name %>.js', 
+				'lib/<%= pkg.name %>.min.js'
+			],
+			supermodel: [
+				'lib/supermodel.jsonify.js', 
+				'lib/supermodel.jsonify.min.js'
+			]
 		},
 		preprocess: {
-			bundle: {
-				src: 'src/build/bundled.js',
+			base: {
+				src: 'src/build/base.js',
 				dest: 'tmp/<%= pkg.name %>.js'
+			},
+			supermodel: {
+				src: 'src/build/supermodel.js',
+				dest: 'tmp/supermodel.jsonify.js'
 			}
 		},
 		template: {
@@ -37,19 +54,30 @@ module.exports = function (grunt) {
 					version: '<%= pkg.version %>'
 				}
 			},
-			bundle: {
-				src: '<%= preprocess.bundle.dest %>',
-				dest: '<%= preprocess.bundle.dest %>'
+			base: {
+				src: '<%= preprocess.base.dest %>',
+				dest: '<%= preprocess.base.dest %>'
+			},
+			supermodel: {
+				src: '<%= preprocess.supermodel.dest %>',
+				dest: '<%= preprocess.supermodel.dest %>'
 			}
 		},
 		concat: {
 			options: {
-				banner: '<%= meta.banner %>',
+				banner: '<%= meta.base_banner %>',
 				stripBanners: true
 			},
-			lib: {
-				src: '<%= preprocess.bundle.dest %>',
+			base: {
+				src: '<%= preprocess.base.dest %>',
 				dest: 'lib/<%= pkg.name %>.js'
+			},
+			supermodel: {
+				options: {
+					banner: '<%= meta.supermodel_banner %>'
+				},
+				src: '<%= preprocess.supermodel.dest %>',
+				dest: 'lib/supermodel.jsonify.js'
 			}
 		},
 		jshint: {
@@ -59,23 +87,31 @@ module.exports = function (grunt) {
 			gruntfile: {
 				src: 'Gruntfile.js'
 			},
-			source: {
-				src: ['<%= concat.lib.dest %>']
+			base: {
+				src: ['<%= concat.base.dest %>']
 			},
-			test: {
-				src: ['test/**/*_test.js']
+			supermodel: {
+				src: ['<%= concat.supermodel.dest %>']
+			},
+			baseTest: {
+				src: ['test/base/*.js']
 			}
 		},
 		qunit: {
-			files: ['test/**/*.html']
+			base: ['test/base/*.html'],
+			supermodel: ['test/supermodel/*.html']
 		},
 		uglify: {
 			options: {
 				banner: '<%= banner %>'
 			},
-			lib: {
-				src: '<%= concat.lib.dest %>',
+			base: {
+				src: '<%= concat.base.dest %>',
 				dest: 'lib/<%= pkg.name %>.min.js'
+			},
+			supermodel: {
+				src: '<%= concat.supermodel.dest %>',
+				dest: 'lib/supermodel.jsonify.min.js'
 			}
 		},
 		watch: {
@@ -83,13 +119,13 @@ module.exports = function (grunt) {
 				files: '<%= jshint.gruntfile.src %>',
 				tasks: ['jshint:gruntfile']
 			},
-			source: {
-				files: ['<%= concat.lib.src %>'],
-				tasks: ['clean:lib', 'concat', 'jshint:source', 'jshint:test', 'qunit']
+			base: {
+				files: ['<%= concat.base.src %>'],
+				tasks: ['clean:base', 'concat:base', 'jshint:baseTest', 'jshint:test', 'qunit:base']
 			},
-			test: {
-				files: ['<%= jshint.test.src %>', '<%= qunit.files %>'],
-				tasks: ['jshint:test', 'qunit']
+			baseTest: {
+				files: ['<%= jshint.baseTest.src %>', '<%= qunit.files %>'],
+				tasks: ['jshint:baseTest', 'qunit:base']
 			}
 		}
 	});
@@ -101,8 +137,32 @@ module.exports = function (grunt) {
 		} // if
 	});
 
+	var baseTasks = [
+		'clean:base',
+		'preprocess:base',
+		'template:base',
+		'concat:base',
+		'jshint:base',
+		'qunit:base',
+		'uglify:base'
+	];
+
 	// Default task.
-	grunt.registerTask('default', ['clean', 'preprocess', 'template', 'concat', 'jshint', 'qunit', 'uglify']);
+	grunt.registerTask('default', baseTasks);
+	grunt.registerTask('base', baseTasks);
+
+	var supermodelTasks = [
+		'clean:supermodel',
+		'preprocess:supermodel',
+		'template:supermodel',
+		'concat:supermodel',
+		'jshint:supermodel',
+		'qunit:supermodel',
+		'uglify:supermodel'
+	];
+
+	grunt.registerTask('supermodel', supermodelTasks);
+	
 	// Test task.
 	grunt.registerTask('test', ['qunit']);
 

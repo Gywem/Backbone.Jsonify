@@ -16,7 +16,7 @@
 }(this, function (Backbone, _) {
 	'use strict';
 
-  Backbone.Jsonify = {};
+	Backbone.Jsonify = {};
 
 	Backbone.Jsonify.VERSION =  '<%= version %>';
 
