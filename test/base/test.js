@@ -19,10 +19,38 @@ var movie = new Backbone.Model({
 	director: director
 });
 
-test("Picks attributes provided by \"includeInJson\" option.", function () {
+test("Default jsonify.", function () {
+	var json = artist.toJSON();
+
+	deepEqual(json, {
+		firstName: 	"Wassily",
+		lastName: 	"Kandinsky",
+		age: 26
+	});
+	
+});
+
+test("Picks attributes provided by \"pick\" option.", function () {
+	// Boolean parameter
+	var json = artist.toJSON({
+		pick: true // pick all attributes
+	});
+
+	deepEqual(json, {
+		firstName: 	"Wassily",
+		lastName: 	"Kandinsky",
+		age: 26
+	});
+
+	json = artist.toJSON({
+		pick: false // Picks no attributes
+	});
+
+	deepEqual(json, {});
+
 	// String parameter
 	var json = artist.toJSON({
-		includeInJson: "firstName" // Only picks firstName
+		pick: "firstName" // Only picks firstName
 	});
 
 	// Outputs {firstName: "Wassily"}
@@ -32,7 +60,7 @@ test("Picks attributes provided by \"includeInJson\" option.", function () {
 
 	// Array parameter
 	json = artist.toJSON({
-		includeInJson: ["firstName", "lastName"] // Picks firstName and lastName
+		pick: ["firstName", "lastName"] // Picks firstName and lastName
 	});
 
 	// Outputs {firstName: "Wassily", lastName: "Kandinsky"}
@@ -43,7 +71,7 @@ test("Picks attributes provided by \"includeInJson\" option.", function () {
 
 	// Function parameter
 	json = artist.toJSON({
-		includeInJson: function(attrValue, attrKey, object) { // Only picks firstName and attribute values that are numbers
+		pick: function(attrValue, attrKey, object) { // Only picks firstName and attribute values that are numbers
 			return (attrKey == "firstName") 
 				|| _.isNumber(attrValue);
 		}
@@ -57,10 +85,27 @@ test("Picks attributes provided by \"includeInJson\" option.", function () {
 
 });
 
-test("Omits attributes provided by \"excludeInJson\" option.", function () {
-	// String parameter
+test("Omits attributes provided by \"omit\" option.", function () {
+	// Boolean parameter
 	var json = artist.toJSON({
-		excludeInJson: "firstName" // Omits firstName
+		omit: true // Omits all attributes
+	});
+
+	deepEqual(json, {});
+
+	json = artist.toJSON({
+		omit: false // Omits no attributes
+	});
+
+	deepEqual(json, {
+		firstName: 	"Wassily",
+		lastName: 	"Kandinsky",
+		age: 26
+	});
+
+	// String parameter
+	json = artist.toJSON({
+		omit: "firstName" // Omits firstName
 	});
 
 	// Outputs {lastName: "Kandinsky"}
@@ -71,7 +116,7 @@ test("Omits attributes provided by \"excludeInJson\" option.", function () {
 
 	// Array parameter
 	json = artist.toJSON({
-		excludeInJson: ["firstName", "lastName"] // Omits firstName and lastName
+		omit: ["firstName", "lastName"] // Omits firstName and lastName
 	});
 
 	// Outputs {age: 26}
@@ -81,7 +126,7 @@ test("Omits attributes provided by \"excludeInJson\" option.", function () {
 
 	// Function parameter
 	json = artist.toJSON({
-		excludeInJson: function(attrValue, attrKey, object) { // Omits firstName and attribute values that are numbers
+		omit: function(attrValue, attrKey, object) { // Omits firstName and attribute values that are numbers
 			return (attrKey == "firstName") 
 				|| _.isNumber(attrValue);
 		}
@@ -95,8 +140,15 @@ test("Omits attributes provided by \"excludeInJson\" option.", function () {
 });
 
 test("Deep serialization.", function () {
-	var json = director.toJSON();
+	var json = director.toJSON({
+		deepJson: true
+	});
 	ok(json.lastName !== director.attributes.lastName);
+
+	json = director.toJSON({
+		deepJson: false
+	});
+	ok(json.lastName === director.attributes.lastName);
 });
 
 test("Serializes model and collection attributes.", function () {

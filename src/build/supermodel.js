@@ -2,18 +2,19 @@
 
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
-		define(['backbone', 'underscore'], factory);
+		define(['supermodel', 'backbone', 'underscore'], factory);
 	} else if (typeof module === 'object' && module.exports) {
 		// CommonJS
-		var Backbone = require('backbone'),
+		var Supermodel = require('supermodel'),
+			Backbone = require('backbone'),
 			_ = require('underscore');
 
-		module.exports = factory(Backbone, _);
+		module.exports = factory(Supermodel, Backbone, _);
 	} else {
 		// Browser globals
-		factory(root.Backbone, root._);
+		factory(root.Supermodel, root.Backbone, root._);
 	}
-}(this, function (Backbone, _) {
+}(this, function (Supermodel, Backbone, _) {
 	'use strict';
 
 	Backbone.Jsonify = {};

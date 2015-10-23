@@ -14,18 +14,22 @@ model.toJSON([options])
 
 ### Options
 
-#### includeInJson
+#### pick
 
 
 **String**, **String[]** or **Function**. Returns the object which represents the model but only picks the provided attribute/s. 
 
 The function looks through each attribute in the model, and picks all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
 
-#### excludeInJson
+#### omit
 
 **String**, **String[]** or **Function**. Returns the object which represents the model but omits the provided attribute/s.
 
 The function looks through each attribute in the model, and omits all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
+
+#### deepJson
+
+**Boolean**. Whether or not to copy deeply model's attributes which are array or objects.
 
 ### Examples
 ```javascript
@@ -35,23 +39,23 @@ var artist = new Backbone.Model({
 });
 
 artist.toJSON({
-	includeInJson: "firstName" // Only picks firstName
+	pick: "firstName" // Only picks firstName
 }); // Outputs {firstName: "Wassily"}
 
 artist.toJSON({
-	excludeInJson: "firstName" // Omits firstName
+	omit: "firstName" // Omits firstName
 }); // Outputs {lastName: "Kandinsky"}
 
 artist.set({age: 26});
 
 artist.toJSON({
-	includeInJson: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
+	pick: function(attrKey, attrValue) { // Only picks firstName and attribute values that are numbers
         return (attrKey == "firstName") || _.isNumber(attrValue);
     }
 }); // Outputs {firstName: "Wassily", age: 26}
 
 artist.toJSON({
-	excludeInJson: function(attrKey, attrValue) { // Omits firstName and attribute values that are numbers
+	omit: function(attrKey, attrValue) { // Omits firstName and attribute values that are numbers
         return (attrKey == "firstName") || _.isNumber(attrValue);
     }
 }); // Outputs {lastName: "Kandinsky"}
