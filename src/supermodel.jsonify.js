@@ -1,212 +1,249 @@
 var exToJSON = Backbone.Model.prototype.toJSON;
 
 var allAssociations = function () {
-	var allAssociations = {};
+  var allAssociations = {};
 
-	var ctor = this;
-	do { 
-		_.extend(allAssociations, ctor._associations);
-		ctor = ctor.parent;
-	} while (ctor);
+  var ctor = this;
+  do {
+    _.extend(allAssociations, ctor._associations);
+    ctor = ctor.parent;
+  } while (ctor);
 
-	return allAssociations;
+  return allAssociations;
 };
 
-var toJSON = function (options) {	
-	if (this instanceof Backbone.Model) {
-		return toJSONModel.call(this, options);
-	} else if (this instanceof Backbone.Collection) {
-		return toJSONCollection.call(this, options);
-	}
+var toJSON = function (options) {
+  if (this instanceof Backbone.Model) {
+    return toJSONModel.call(this, options);
+  } else if (this instanceof Backbone.Collection) {
+    return toJSONCollection.call(this, options);
+  }
 };
 
 var toJSONModel = function (options) {
-	if (_.isFunction(options.assoc)) {
-		options.pick = [];
-		_.each(this.attributes, function (value, key) {			
-			if (options.assoc(options.assocName, value, key, this)) {
-				options.pick.push(key);
-			}
-		}, this);
-	}
+  // Building the attribute configuration.
+  var assocAttrConfig = getAssocAttrConfig(options.assocName, this, options);
 
-	return this.toJSON(options);
+  return this.toJSON(_.extend(options, assocAttrConfig));
 };
 
-var toJSONCollection = function (options) {	
-	var output = [];
-	this.each(function (model) {
-		output.push(toJSONModel.call(model, options));
-	}, this);
+var toJSONCollection = function (options) {
+  var output = [];
+  this.each(function (model) {
+    output.push(toJSONModel.call(model, options));
+  }, this);
 
-	return output;
+  return output;
 };
 
+/*
+ * Gets the association config.
+ * @return {Object|Boolean} Returns a concrete config for
+ * the assoc or the default one. Otherwise, false.
+ **/
 var getAssocConfig = function (assocName, assocOption) {
-	var assocConfig = {};
+  var assocConfig = {};
 
-	if (_.isObject(assocOption) &&
-		!_.isFunction(assocOption)) {
-		// Config as an object.
+  if (_.isObject(assocOption) &&
+    !_.isFunction(assocOption)) {
+    // Config as an object.
 
-		var defaultAssocOptions = assocOption['*'];
+    var defaultAssocOptions = assocOption['*'];
 
-		// The configuration for the assoc is false.
-		if (_.isBoolean(defaultAssocOptions) && defaultAssocOptions) {
-			defaultAssocOptions = {
-				pick: true
-			};
-		}
+    // The configuration for the assoc is false.
+    if (_.isBoolean(defaultAssocOptions) && defaultAssocOptions) {
+      defaultAssocOptions = {
+        pick: true
+      };
+    }
 
-		assocConfig = assocOption[assocName];
+    assocConfig = assocOption[assocName];
 
-		// The configuration for the assoc is false.
-		if (_.isBoolean(assocConfig) &&
-			!assocConfig) {
-			return false;
-		}
+    // The configuration for the assoc is false.
+    if (_.isBoolean(assocConfig) &&
+      !assocConfig) {
+      return false;
+    }
 
-		// There is not configuration available
-		// for the assoc, but default one.
-		if (_.isObject(assocOption) &&
-			!_.isFunction(assocOption) &&
-			_.isObject(defaultAssocOptions) &&
-			!assocConfig) {
-			assocConfig = defaultAssocOptions;
-		}
+    // There is not configuration available
+    // for the assoc, but default one.
+    if (_.isObject(assocOption) &&
+      !_.isFunction(assocOption) &&
+      _.isObject(defaultAssocOptions) &&
+      !assocConfig) {
+      assocConfig = defaultAssocOptions;
+    }
 
-		// There is not configuration available for the assoc (neither default nor assoc).
-		if (_.isObject(assocOption) &&
-			!_.isFunction(assocOption) &&
-			_.isBoolean(defaultAssocOptions) &&
-			!defaultAssocOptions &&
-			!assocConfig) {
-			return false;
-		}
+    // There is not configuration available for the assoc (neither default nor assoc).
+    if (_.isObject(assocOption) &&
+      !_.isFunction(assocOption) &&
+      _.isBoolean(defaultAssocOptions) &&
+      !defaultAssocOptions &&
+      !assocConfig) {
+      return false;
+    }
 
-		// There is not any configuration for the assoc.
-		if (_.isObject(assocOption) &&
-			!_.isFunction(assocOption) &&
-			_.isUndefined(defaultAssocOptions) && 
-			!assocConfig) {
-			return false;
-		}
+    // There is not any configuration for the assoc.
+    if (_.isObject(assocOption) &&
+      !_.isFunction(assocOption) &&
+      _.isUndefined(defaultAssocOptions) &&
+      !assocConfig) {
+      return false;
+    }
 
-	} else if (_.isFunction(assocOption)) {
-		// Config as an function. 
-		assocConfig.assoc = assocOption;
-	}
+  } else if (_.isFunction(assocOption)) {
+    // Config as an function.
+    assocConfig.assoc = assocOption;
+  }
 
-	return assocConfig;
+  return assocConfig;
 };
 
-Supermodel.Model.prototype.toJSON = _.wrap(exToJSON, 
-	function (exToJSON) {
-		var options = arguments[1];
+/*
+ * Gets the attribute config of the assoc.
+ * @return {Object|Boolean} Returns a concrete attribute config for
+ * the assoc.
+ **/
+var getAssocAttrConfig = function (assocName, assocStore, options) {
+  var assocAttrConfig = {};
 
-		options || (options = {});
+  var assocAttrFunc,
+      assocAttrOption = [];
 
-		// Jsonify model
-		var output = exToJSON.call(this, options);
+  if (_.isFunction(options.assocPick)) {
+    // A function to pick attributes is set
+    assocAttrFunc = options.assocPick;
+    assocAttrConfig.pick = assocAttrOption;
+  } else if (_.isFunction(options.assocOmit)) {
+    // A function to omit attributes is set
+    assocAttrFunc = options.assocOmit;
+    assocAttrConfig.omit = assocAttrOption;
+  }
 
-		// Include cid?
-		if (!options.cid) {
-			delete output[this.cidAttribute];
-		}
+  if (assocAttrFunc) {
+    // Looks through each attribute that pass the truth test.
+    _.each(assocStore.attributes, function (value, key) {
+      if (assocAttrFunc(assocName, value, key, assocStore)) {
+        assocAttrOption.push(key);
+      }
+    }, assocStore);
 
-		var assocOption = options.assoc;
-		// Jsonify assocs?
-		if ((_.isObject(assocOption) || _.isBoolean(assocOption) || _.isFunction(assocOption)) &&
-			assocOption) {
-			// the assoc config is an object, function or boolean.
+    // All attributes results to be omitted.
+    if (assocAttrOption.length === 0) {
+      return {
+        omit: true
+      };
+    }
+  }
 
-			var defaultAssocOptions;
-			// Config as an object. Get default config for each association.
-			if (_.isObject(assocOption) &&
-				!_.isFunction(assocOption)) {
-				defaultAssocOptions = assocOption['*'];
-			}
+  return assocAttrConfig;
+};
 
-			// Config as an object. Only "*" is set and false.
-			if (_.isObject(assocOption)  &&
-				!_.isFunction(assocOption) &&
-				_.keys(assocOption).length === 1 &&
-				_.isBoolean(defaultAssocOptions) &&
-				!defaultAssocOptions) {
-				return output;
-			}
+Supermodel.Model.prototype.toJSON = _.wrap(exToJSON,
+  function (exToJSON) {
+    var options = arguments[1];
 
-			// Prepares an object of assocs with assocName as key 
-			// and assocStore as value.
-			var allAssoc = allAssociations.call(this.constructor);
-			allAssoc = _.mapObject(allAssoc, function (assoc) {
-				return this[assoc.name]();
-			}, this);
+    options || (options = {});
 
-			// Iterates over associations.
-			for (var assocName in allAssoc) {
-				if (allAssoc.hasOwnProperty(assocName)) {
-					var assocStore = allAssoc[assocName];
+    // Jsonify model
+    var output = exToJSON.call(this, options);
 
-					var assocConfig = getAssocConfig(assocName, assocOption);
+    // Include cid?
+    if (!options.cid) {
+      delete output[this.cidAttribute];
+    }
 
-					// There is not a valid config for the assoc. Skip current assoc jsonify.
-					if (!assocConfig) {
-						continue;
-					}
+    var assocOption = options.assoc;
+    // Jsonify assocs?
+    if ((_.isObject(assocOption) || _.isBoolean(assocOption) || _.isFunction(assocOption)) &&
+      assocOption) {
+      // the assoc config is an object, function or boolean.
 
-					var newAssocConfig = _.extend({}, options, {
-						assoc: undefined, // Cleans assoc option.
-						pick: undefined, // Cleans pick option.
-						omit: undefined // Cleans omit option.
-					}, assocConfig);
+      var defaultAssocOptions;
+      // Config as an object. Get default config for each association.
+      if (_.isObject(assocOption) &&
+        !_.isFunction(assocOption)) {
+        defaultAssocOptions = assocOption['*'];
+      }
 
-					// Jsonify deep mode.
-					if (options.deepAssoc) {
-						var avoidLoop = _.union([], options.avoidLoop);
+      // Config as an object. Only "*" is set and false.
+      if (_.isObject(assocOption)  &&
+        !_.isFunction(assocOption) &&
+        _.keys(assocOption).length === 1 &&
+        _.isBoolean(defaultAssocOptions) &&
+        !defaultAssocOptions) {
+        return output;
+      }
 
-						// Check if prevent loop.
-						if (!assocOption.assoc || 
-							(assocOption.assoc && !assocOption.assoc[assocName])) { // There is not an assoc config.
-							if (assocStore instanceof Backbone.Model) {
-								if (_.indexOf(avoidLoop, assocStore) >= 0) {
-									continue;
-								}
-							} else if (assocStore instanceof Backbone.Collection) {
-								if (_.indexOf(avoidLoop, assocStore.owner) >= 0) {
-									continue;
-								}
-							}
-						}
+      // Prepares an object of assocs with assocName as key
+      // and assocStore as value.
+      var allAssoc = allAssociations.call(this.constructor);
+      allAssoc = _.mapObject(allAssoc, function (assoc) {
+        return this[assoc.name]();
+      }, this);
 
-						// Builds the option for excluding models already jsonified.
-						avoidLoop = _.union(avoidLoop, _.values(allAssoc), [this]);
+      // Iterates over associations.
+      for (var assocName in allAssoc) {
+        if (allAssoc.hasOwnProperty(assocName)) {
+          var assocStore = allAssoc[assocName];
 
-						// Prepares the option for the deep models.
-						_.extend(newAssocConfig, {
-							assoc: {
-								"*": defaultAssocOptions // The default config for associations is spread.
-							},
-							deepAssoc: true,
-							avoidLoop: avoidLoop 
-						}, assocConfig);
-					}
+          var assocConfig = getAssocConfig(assocName, assocOption);
 
-					if (_.isFunction(assocOption)) {
-						if (!assocOption(assocName, undefined, undefined, assocStore)) {
-							continue;
-						}
+          // There is not a valid config for the assoc. Skip current assoc jsonify.
+          if (!assocConfig) {
+            continue;
+          }
 
-						_.extend(newAssocConfig, {
-							assocName: assocName
-						});
-					}
+          var newAssocConfig = _.extend({}, options, {
+            assocName: assocName,
+            assoc: undefined, // Cleans assoc option.
+            pick: undefined, // Cleans pick option.
+            omit: undefined // Cleans omit option.
+          }, assocConfig);
 
-					// Jsonify assoc.
-					output[assocName] = toJSON.call(assocStore, newAssocConfig);
-				}
-			}
-		}
+          // Jsonify deep mode.
+          if (options.deepAssoc) {
+            var avoidLoop = _.union([], options.avoidLoop);
 
-		return output;
-	});
+            // Check if prevent loop.
+            if (!assocOption.assoc ||
+              (assocOption.assoc && !assocOption.assoc[assocName])) { // There is not an assoc config.
+              if (assocStore instanceof Backbone.Model) {
+                if (_.indexOf(avoidLoop, assocStore) >= 0) {
+                  continue;
+                }
+              } else if (assocStore instanceof Backbone.Collection) {
+                if (_.indexOf(avoidLoop, assocStore.owner) >= 0) {
+                  continue;
+                }
+              }
+            }
+
+            // Builds the option for excluding models already jsonified.
+            avoidLoop = _.union(avoidLoop, _.values(allAssoc), [this]);
+
+            // Prepares the option for the deep models.
+            _.extend(newAssocConfig, {
+              assoc: {
+                "*": defaultAssocOptions // The default config for associations is spread.
+              },
+              deepAssoc: true,
+              avoidLoop: avoidLoop
+            }, assocConfig);
+          }
+
+          // The assoc option is a function.
+          if (_.isFunction(assocOption)) {
+            if (!assocOption(assocName, assocStore)) {
+              continue;
+            }
+          }
+
+          // Jsonify assoc.
+          output[assocName] = toJSON.call(assocStore, newAssocConfig);
+        }
+      }
+    }
+
+    return output;
+  });

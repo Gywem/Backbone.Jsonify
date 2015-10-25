@@ -8,7 +8,7 @@
     "eqeqeq"        : true,
     "forin"         : true,
     "immed"         : false,
-    "indent"        : 2, 
+    "indent"        : 2,
     "latedef"       : false,
     "newcap"        : false,
     "noarg"         : true,
@@ -52,8 +52,10 @@
     "supernew"      : false,
     "validthis"     : false,
 
+    "smarttabs"     : true,
+
     "predef" : ["define"],
-    
+
     "globals"       : {
         "module"    : true,
         "require"   : true

@@ -110,7 +110,7 @@ test('Picks and omits from Supermodel.', function () {
 
   modelJson = group.toJSON({
     omit: "id"
-  }); // Outputs {name: "Jsonify"} 
+  }); // Outputs {name: "Jsonify"}
 
   deepEqual(modelJson, {
     name: "Jsonify"
@@ -166,7 +166,7 @@ test('Picks all associations from a Supermodel.', function () {
         user_id: undefined
       },
       {
-        id: 4,        
+        id: 4,
         group_id: 1,
         user_id: undefined
       }
@@ -179,7 +179,7 @@ test('Picks all associations from a Supermodel.', function () {
 });
 
 test('Omit all associations from a Supermodel.', function () {
-  
+
   var user = User.create({
     settings: {
       subscribed: true
@@ -200,7 +200,7 @@ test('Omit all associations from a Supermodel.', function () {
 });
 
 test('Jsonify associations from a Supermodel.', function () {
-  
+
   var user = User.create({
     settings: {
       subscribed: true
@@ -301,12 +301,12 @@ test('Jsonify associations from a Supermodel.', function () {
       {group: {id: 1}, user: {}},
       {group: {id: 1}, user: {}}
     ]
-  }); 
+  });
 
 });
 
 test('Jsonify associations deeply from a Supermodel.', function () {
-  
+
   var user = User.create({
     settings: {
       subscribed: true
@@ -345,7 +345,7 @@ test('Jsonify associations deeply from a Supermodel.', function () {
 });
 
 test('Jsonify associations from a Supermodel using a function.', function () {
-  
+
   var user = User.create({
     settings: {
       subscribed: true
@@ -358,22 +358,35 @@ test('Jsonify associations from a Supermodel using a function.', function () {
 
   var modelJson = user.toJSON({
     pick: false,
-    assoc: function (assocName, value, key, model) {
+    assoc: function (assocName, model) {
       switch(assocName) {
         case "settings":
-          return !key ||
-            key === "subscribed";
+          return true;
 
         case "group":
-          return !key ||
-            key === "id";
+          return true;
 
         case "memberships":
-          return !key;
+          return true;
 
       }
 
       return false;
+    },
+    assocPick: function (assocName, value, key, model) {
+      switch(assocName) {
+          case "settings":
+            return key === "subscribed";
+
+          case "group":
+            return key === "id";
+
+          case "memberships":
+            return false;
+
+        }
+
+      return true;
     },
     deepAssoc: true // Jsonify associations deeply
   });
