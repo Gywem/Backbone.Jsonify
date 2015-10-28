@@ -99,16 +99,16 @@ or a **Function** invoked with the following interface:
 ```javascript
 function (assocName, model)
 ```
-and tests which associations it may include.
+and tests which associations it must include.
 
 #### assocPick
-A **Function** that tests which attributes for each association may be included.
+A **Function** that tests which attributes for each association must be included.
 
 ```javascript
 function (assocName, value, key, model)
 ```
 #### assocOmit
-A **Function** that tests which attributes for each association may be excluded.
+A **Function** that tests which attributes for each association must be excluded.
 
 ```javascript
 function (assocName, value, key, model)
