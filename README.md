@@ -64,6 +64,8 @@ artist.toJSON({
 ## Supermodel compatibility
 [Supermodel](http://pathable.github.io/supermodel/) is a Backbone plugin for model tracking and relationships between models. Backbone.Jsonify has been adapted to work along such library and it provides more options to address the jsonify process of the relationships.
 
+For using it, it is needed to include the Supermodel library just before *supermodel.jsonify.js* or the minimized version of the plugin.
+
 ### Options
 
 #### assoc
