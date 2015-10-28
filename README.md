@@ -17,13 +17,13 @@ model.toJSON([options])
 #### pick
 
 
-**String**, **String[]** or **Function**. Returns the object which represents the model but only picks the provided attribute/s. 
+**String**, **String[]**, **Boolean**, or **Function**. Returns the object which represents the model but only picks the provided attribute/s. 
 
 The function looks through each attribute in the model, and picks all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
 
 #### omit
 
-**String**, **String[]** or **Function**. Returns the object which represents the model but omits the provided attribute/s.
+**String**, **String[]**, **Boolean** or **Function**. Returns the object which represents the model but omits the provided attribute/s.
 
 The function looks through each attribute in the model, and omits all the attributes that pass a truth test defined by the function, which is invoked with up to three arguments; (value [, index|key, object]).
 
@@ -61,6 +61,59 @@ artist.toJSON({
 }); // Outputs {lastName: "Kandinsky"}
 
 ```
+## Supermodel compatibility
+[Supermodel](http://pathable.github.io/supermodel/) is a Backbone plugin for model tracking and relationships between models. Backbone.Jsonify has been adapted to work along such library and it provides more options to address the jsonify process of the relationships.
+
+### Options
+
+#### assoc
+Serialices the model associations by a configuration.
+
+**Object** representing:
+
+```javascript
+{
+	'*': defaultConfiguration, // Takes a default configuration for all associations (optional)
+	associationName : configuration,
+    // [...] more association configs
+}
+```
+
+The **Configuration** may accept a boolean or an object.
+
+* **Boolean**. Set to true to serialize the related model and the full set of attributes and associations. In case of false, the relationship is not be serialized.
+* **Object**. Serializes the related model and represents a configuration for the association.
+  * **pick**. **String**, **String[]**, **Boolean**, or **Function**.  Includes the provided attribute/s.
+  * **omit**. **String**, **String[]**, **Boolean**, or **Function**. Omits the provided attribute/s.
+  * **assoc**. **Object** or **Function**.
+  * **assocPick**. **Object** or **Function**.
+  * **assocOmit**. **Function**.
+  * **assocPick**. **Function**.
+  * **deepAssoc**. **Boolean**.
+ 
+or a **Function** invoked with the following interface:
+
+
+```javascript
+function (assocName, model)
+```
+and tests which associations it may include.
+
+#### assocPick
+A **Function** that tests which attributes for each association may be included.
+
+```javascript
+function (assocName, value, key, model)
+```
+#### assocOmit
+A **Function** that tests which attributes for each association may be excluded.
+
+```javascript
+function (assocName, value, key, model)
+```
+#### deepAssoc
+**Boolean**. Performs a deep serialization of the model and the relationships.
+
 ## Building and Testing
 First install locally all the required development dependencies.
 ```bash
@@ -70,6 +123,16 @@ npm install
 ### Building
 ```bash
 grunt
+```
+#### Backbone.Jsonify
+
+```bash
+grunt base
+```
+
+#### Supermodel.Jsonify
+```bash
+grunt supermodel
 ```
 
 ### Testing
