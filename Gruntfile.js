@@ -147,8 +147,6 @@ module.exports = function (grunt) {
 		'uglify:base'
 	];
 
-	// Default task.
-	grunt.registerTask('default', baseTasks);
 	grunt.registerTask('base', baseTasks);
 
 	var supermodelTasks = [
@@ -162,6 +160,9 @@ module.exports = function (grunt) {
 	];
 
 	grunt.registerTask('supermodel', supermodelTasks);
+
+	// Default task.
+	grunt.registerTask('default', baseTasks.concat(supermodelTasks));
 	
 	// Test task.
 	grunt.registerTask('test', ['qunit']);
