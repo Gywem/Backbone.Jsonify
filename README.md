@@ -88,9 +88,8 @@ The **Configuration** may accept a boolean or an object.
   * **pick**. **String**, **String[]**, **Boolean**, or **Function**.  Includes the provided attribute/s.
   * **omit**. **String**, **String[]**, **Boolean**, or **Function**. Omits the provided attribute/s.
   * **assoc**. **Object** or **Function**.
-  * **assocPick**. **Object** or **Function**.
-  * **assocOmit**. **Function**.
   * **assocPick**. **Function**.
+  * **assocOmit**. **Function**.
   * **deepAssoc**. **Boolean**.
  
 or a **Function** invoked with the following interface:
