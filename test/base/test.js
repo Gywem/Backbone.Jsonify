@@ -27,6 +27,17 @@ test("Default jsonify.", function () {
 		lastName: 	"Kandinsky",
 		age: 26
 	});
+
+	json = director.toJSON();
+
+	deepEqual(json, {
+		firstName: "Pedro",
+		lastName: {
+			first: 	"Montoro",
+			second: "Gimeno"
+		},
+		age: 38
+	});
 	
 });
 
