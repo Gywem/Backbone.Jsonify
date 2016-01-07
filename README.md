@@ -1,4 +1,4 @@
-# Backbone.Jsonify
+# backbone-jsonify
 
 Backbone Jsonify alters and provides a extended configuration to the "toJSON" method for models and collections. In general terms, the library enhances it by the following features: 
 
