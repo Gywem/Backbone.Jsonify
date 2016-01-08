@@ -1,11 +1,8 @@
 {
   "name": "backbone-jsonify",
   "description": "Backbone helper that alters \"toJson\" function to extend functionalities.",
-  "version": "0.2.0",
-  "author": {
-    "name": "Nacho Codoñer",
-    "email": "igcogi@gmail.com"
-  },
+  "version": "1.0.0",
+  "author": "Nacho Codoñer <igcogi@gmail.com>",
   "repository": [
     {
       "type": "git",
@@ -37,11 +34,15 @@
     "unwrap": "0.1.0"
   },
   "directories": {
-    "lib": "./lib",
-    "doc": "./doc"
+    "test": "test"
   },
   "engines": {
     "node": ">=0.8"
   },
-  "keywords": []
+  "keywords": [],
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
 }
